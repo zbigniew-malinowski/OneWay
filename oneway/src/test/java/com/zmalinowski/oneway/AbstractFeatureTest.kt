@@ -15,7 +15,7 @@ class AbstractFeatureTest {
     private lateinit var events: TestObserver<Result>
     private lateinit var states: TestObserver<State>
     private lateinit var feature: FakeFeature
-    private lateinit var command: Command<Result>
+    private lateinit var command: () -> Observable<Result>
     private lateinit var result: Observable<Result>
 
     @Before
@@ -88,11 +88,11 @@ class AbstractFeatureTest {
 
 class FakeFeature(
         intentions: Observable<Intention>,
-        private val command: Command<Result>
+        private val command: () -> Observable<Result>
 ) : AbstractFeature<State, Message, Intention, Result>(State(), intentions) {
 
-    override fun onMessage(state: State, message: Message): Pair<State, Command<Result>?> = when (message) {
-        Intention -> state to command
+    override fun onMessage(state: State, message: Message): Pair<State, Observable<Result>?> = when (message) {
+        Intention -> state to command()
         Result -> state.copy(modified = true) to null
     }
 }

@@ -24,15 +24,14 @@ abstract class AbstractFeature<State, Message, in Intention : Message, Result : 
                 .share()
     }
 
-    protected abstract fun onMessage(state: State, message: Message): Pair<State, Command<Result>?>
+    protected abstract fun onMessage(state: State, message: Message): Pair<State, Observable<Result>?>
 
     private fun reduce(state: State, message: Message): State {
         val (newState, command) = onMessage(state, message)
         return newState.also { command?.execute() }
     }
 
-    private fun Command<Result>.execute() = invoke()
-            .observeOn(scheduler) //  ensure processing in separate loops
+    private fun Observable<Result>.execute() = observeOn(scheduler) //  ensure processing in separate loops
             .subscribe(effects::onNext) { onCommandError(it) }
 
     protected open fun onCommandError(e: Throwable) {
@@ -45,5 +44,3 @@ abstract class AbstractFeature<State, Message, in Intention : Message, Result : 
 
     override fun isDisposed(): Boolean = signal.hasValue()
 }
-
-typealias Command<T> = () -> Observable<T>
