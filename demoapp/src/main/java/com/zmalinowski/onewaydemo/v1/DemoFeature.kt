@@ -1,9 +1,9 @@
-package com.zmalinowski.onewaydemo
+package com.zmalinowski.onewaydemo.v1
 
 import com.zmalinowski.oneway.AbstractFeature
-import com.zmalinowski.onewaydemo.Message.Intention
-import com.zmalinowski.onewaydemo.Message.Result
-import com.zmalinowski.onewaydemo.Value.Status
+import com.zmalinowski.onewaydemo.v1.Message.Intention
+import com.zmalinowski.onewaydemo.v1.Message.Result
+import com.zmalinowski.onewaydemo.v1.Value.Status
 import io.reactivex.Observable
 
 class DemoFeature(
@@ -14,14 +14,14 @@ class DemoFeature(
         intentions
 ) {
     override fun onMessage(state: State, message: Message): Pair<State, Observable<Result>?> = when (message) {
-        is Intention.Get -> state.loading() to executor.get(message)
-        is Intention.Add -> state.add(message.content) to executor.add(message)
-        is Intention.Remove -> state.remove(message.content) to executor.remove(message)
+        is Intention.Get -> state.loading() to Executor.get(message)
+        is Intention.Add -> state.add(message.content) to Executor.add(message)
+        is Intention.Remove -> state.remove(message.content) to Executor.remove(message)
         is Result.Added -> state.added(message.content) to null
         is Result.Removed -> state.removed(message.content) to null
         is Result.Failed -> state.revert(message.intention) to null
         is Result.Loaded -> state.loaded(message.data) to null
-        is Message.Intention.Update -> state.update(message) to executor.update(message)
+        is Message.Intention.Update -> state.update(message) to Executor.update(message)
         is Message.Result.Updated -> state to null
     }
 }

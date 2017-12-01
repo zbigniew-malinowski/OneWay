@@ -1,4 +1,4 @@
-package com.zmalinowski.onewaydemo
+package com.zmalinowski.onewaydemo.v1
 
 data class State(
         val data: List<Value> = emptyList(),

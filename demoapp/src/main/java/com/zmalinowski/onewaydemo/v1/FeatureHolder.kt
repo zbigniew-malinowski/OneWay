@@ -1,4 +1,4 @@
-package com.zmalinowski.onewaydemo
+package com.zmalinowski.onewaydemo.v1
 
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject

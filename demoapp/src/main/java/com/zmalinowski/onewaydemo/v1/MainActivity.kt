@@ -1,4 +1,4 @@
-package com.zmalinowski.onewaydemo
+package com.zmalinowski.onewaydemo.v1
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -13,6 +13,8 @@ import android.widget.EditText
 import android.widget.ImageView
 import com.jakewharton.rxbinding2.view.RxView
 import com.jakewharton.rxbinding2.widget.RxTextView
+import com.zmalinowski.onewaydemo.R
+import com.zmalinowski.onewaydemo.v1.Value.Status.*
 import com.zmalinowski.onewaydemo.utils.bindView
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -51,6 +53,7 @@ class MainActivity : AppCompatActivity() {
     private fun EditText.adds() = RxTextView.editorActionEvents(this)
             .filter { it.actionId() == EditorInfo.IME_ACTION_DONE }
             .map { it -> Add(it.view().text.toString()) }
+            .doOnNext { text = null }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -64,7 +67,7 @@ private fun <T, R> Observable<T>.mapNotNull(transform: (T) -> R?): Observable<R>
 class Adapter : RecyclerView.Adapter<ViewHolder>() {
 
     private val data = mutableListOf<Value>()
-    val events = PublishSubject.create<Any>()
+    val events: PublishSubject<Any> = PublishSubject.create<Any>()
 
     fun onData(newData: List<Value>) {
         data.apply {
@@ -95,6 +98,11 @@ class ViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(parent.inflate(R.l
     fun bind(value: Value) {
         this.value = value
         checkBox.text = value.content
+        when (value.status) {
+            NORMAL -> true
+            SAVING -> false
+            DELETING -> false
+        }.let { itemView.isEnabled = it }
     }
 }
 
